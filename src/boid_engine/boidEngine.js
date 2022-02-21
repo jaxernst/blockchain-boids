@@ -85,6 +85,13 @@ export default function boidEngine() {
     let boids
     let posOthers = {}
 
+    // Feature proposal
+    function addBoid() {
+      /* Instead of using the initBoids function, we can turn boid engine into a class
+      and have this function as a method of that class. addBoids can be called anytime 
+      and new boid is introduced. This would also come with a removeBoid() function too. */
+    }
+
     function run(ctx) {      
         const cw = ctx.canvas.width 
         const ch = ctx.canvas.height
@@ -95,6 +102,7 @@ export default function boidEngine() {
         
         for (let boid of boids) {
         
+        // Can't look for neighbors if your boid is the only one rendered  
         if (Object.keys(posOthers).length > 0) {
             const boidIdx = lookForNeighbors(boid.vector.pos, posOthers)
         }
@@ -102,13 +110,13 @@ export default function boidEngine() {
         //spreadForce = spread(boid, others)
         //const alignForce = align(boid, posOthers)
         //gravitateForce = gravitate(boid, others)
-        //totalForce = averageAccel(boid, [spreadAccel, alignAccel, gravitateAccel])
+        //totalForce = averageForces(boid, [spreadAccel, alignAccel, gravitateAccel])
         
         if (boid.attrs.curiosity > Math.random()) {
             const totalForce = randRangeVect(-1, 1)
-            boid.vector.accel = applyForce(totalForce, boid.attrs.mass)
-        }
-    
+          }
+
+        boid.vector.accel = applyForce(totalForce, boid.attrs.mass)
         boid.vector.vel = updateVelocity(boid.vector, boid.attrs.maxSpeed)
         boid.vector.pos = updatePosition(boid.vector, ctx)
         posOthers[boid.id] = boid.vector.pos
