@@ -11,6 +11,7 @@ function App() {
   const [paused, pauseRender] = useState(true)
   const Pause = () => {
     console.log("pausing")
+    
     pauseRender(!paused)
   } 
 

@@ -1,7 +1,7 @@
   import initBoids from './boidGen'
   import { randRangeVect, sortByDistance } from './utilities'
   
-  function calcImpulse(force, mass) {
+  function applyForce(force, mass) {
     return {x: force.x/mass, y: force.y/mass}
   }
   
@@ -9,7 +9,7 @@
     const newVelx = vector.vel.x + vector.accel.x
     const newVely = vector.vel.y + vector.accel.y
 
-    // Enforece speed limit
+    // Enforce speed limit
     if (Math.hypot(newVelx, newVely) < maxSpeed) {
       return {x: newVelx, y: newVely}
     }
@@ -27,7 +27,7 @@
     if (vector.pos.x < 0) {newPosx = cw}
     if (vector.pos.y > ch) {newPosy = 0}
     if (vector.pos.y < 0) {newPosy = ch}
-    
+                       
     return {x: newPosx, y: newPosy }
   }
   
@@ -61,23 +61,44 @@
    ctx.fill()
   }
 
-  function align(boid, others) {
-      const coord_arr = [Object.values(others)]
-      //const sorted = sortByDistance(coord_arr, [boid.vector.pos.x, boid.vector.pos.y])
-      //debugger
+  function align(boid, others) {}
+  function gravitate(boid, others) {}
+  function spread(boid, others) {
+
   }   
 
-  export default function boidEngine() { 
+  function lookForNeighbors(boidPos, others) {
+    /* Get the index of the neighbors within the given boid's sight
+    Algorithm:
+    1. Sort the other boids position by closest to farthest
+    2. Filter out the boids outside of the search distance
+    3. Filter out the boids who are not within 180deg peripheral view of the given boid
+    4. Return the index of those boids
+    */
+
+    const coord_arr = Object.keys(others).map((key) => [others[key].x, others[key].y, key])
+    const sorted = sortByDistance(coord_arr, [boidPos.x, boidPos.y])
+    console.log(sorted[0][0])
+  }
+
+export default function boidEngine() { 
     let boids
-    const posOthers = {}
-    const run  = (ctx) => { 
+    let posOthers = {}
+
+    function run(ctx) {      
         const cw = ctx.canvas.width 
         const ch = ctx.canvas.height
         ctx.clearRect(0,0,cw,ch)
 
-        if (!boids) {boids = initBoids(ctx, 1000, true)}
+        if (!boids) {boids = initBoids(ctx, 600, true)}
+        
         
         for (let boid of boids) {
+        
+        if (Object.keys(posOthers).length > 0) {
+            const boidIdx = lookForNeighbors(boid.vector.pos, posOthers)
+        }
+        
         //spreadForce = spread(boid, others)
         //const alignForce = align(boid, posOthers)
         //gravitateForce = gravitate(boid, others)
@@ -85,12 +106,13 @@
         
         if (boid.attrs.curiosity > Math.random()) {
             const totalForce = randRangeVect(-1, 1)
-            boid.vector.accel = calcImpulse(totalForce, boid.attrs.mass)
+            boid.vector.accel = applyForce(totalForce, boid.attrs.mass)
         }
     
         boid.vector.vel = updateVelocity(boid.vector, boid.attrs.maxSpeed)
         boid.vector.pos = updatePosition(boid.vector, ctx)
         posOthers[boid.id] = boid.vector.pos
+        boids[boid.id].vector = boid.vector
         drawBoidTriangle(ctx, boid)
         }
     }

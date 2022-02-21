@@ -52,25 +52,18 @@ export function createEmptyVector() {
   }
 
 
-function sortFunction(a, b) {
-    if (a[0] === b[0]) {
-        return 0;
-    }
-    else {
-        return (a[0] < b[0]) ? -1 : 1;
-    }
-}
  
 // Sort the array of points by its distance from P
 export function sortByDistance(arr, p) {    
+    // Input arr: [[x,y,ref_idx], [x,y,ref_idx], ...]
+    // Output arr: [[dist, ref_idx], [dist, ref_idx], ...]
     const vp = new Array(arr.length);
     for (var i = 0; i < arr.length; i++) {
-        var dist = Math.pow((p[0] - arr[i][0]), 2)
-              + Math.pow((p[1] - arr[i][1]), 2);
-        vp[i] = [Math.sqrt(dist), [arr[i][0], arr[i][1]]];
+        var dist = Math.hypot(arr[i][0] - p[0], arr[i][1] - p[1])
+        vp[i] = [dist, arr[i][2]];
     }
      
     // Sorting the array with respect to its distance
-    vp.sort(sortFunction);
+    vp[0].sort((a, b) => a[0] - b[0])
     return vp
 }
