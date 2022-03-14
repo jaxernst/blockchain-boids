@@ -81,6 +81,8 @@
     console.log(sorted[0][0])
   }
 
+
+// Covert this to a class
 export default function boidEngine() { 
     let boids
     let posOthers = {}
